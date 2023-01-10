@@ -1,6 +1,7 @@
 #pragma once
 
 #include <math.h>
+#include <random>
 #include <boost/math/distributions/normal.hpp>
 
 class Option {
@@ -23,6 +24,7 @@ public:
   _type   { type }
   {}
   double black_scholes();
+  double monte_carlo_gbm(uint32_t n_sim);
 };
 
 double Option::black_scholes() {
@@ -39,4 +41,27 @@ double Option::black_scholes() {
     return call;
   else
     return put;
+}
+
+double Option::monte_carlo_gbm(uint32_t n_sim) {
+  double drift = (_rate - 0.5 * _vol * _vol) * _T;
+  double diffusion = _vol * sqrt(_T);
+
+  double payoff_sum = 0.0;
+
+  std::default_random_engine generator;
+  std::normal_distribution<double> distribution(0.0, 1.0);
+
+  for (int i = 0; i < n_sim; i++) {
+    double Z = distribution(generator);
+    double S_forward = _price * exp(drift + diffusion * Z);
+
+    if (_type == 'C')
+      payoff_sum += std::max(S_forward - _strike, 0.0);
+    else
+      payoff_sum += std::max(_strike - S_forward, 0.0);
+  }
+
+  return (payoff_sum / n_sim) * exp(-_rate * _T);
+
 }
