@@ -3,6 +3,8 @@
 #include <math.h>
 #include <random>
 #include <boost/math/distributions/normal.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/normal_distribution.hpp>
 
 class Option {
 private:
@@ -49,8 +51,8 @@ double Option::monte_carlo_gbm(uint32_t n_sim) {
 
   double payoff_sum = 0.0;
 
-  std::default_random_engine generator;
-  std::normal_distribution<double> distribution(0.0, 1.0);
+  boost::random::mt19937 generator;
+  boost::random::normal_distribution<> distribution;
 
   for (int i = 0; i < n_sim; i++) {
     double Z = distribution(generator);
