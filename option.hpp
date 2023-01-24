@@ -14,7 +14,7 @@ protected:
   double m_T;       // option maturity
 public:
   Option(double spot, double strike, double sigma, double rate, double div, double T);
-  double get_binomial(const uint32_t& n_steps);
+  virtual double get_binomial(const uint32_t& n_steps);
 };
 
 class Euro_Option : public Option {
