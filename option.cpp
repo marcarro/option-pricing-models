@@ -25,7 +25,10 @@ double Option::get_binomial(const uint32_t& n_steps) {
 
   std::vector<std::vector<double>> option_tree(n_steps + 1, std::vector<double>(n_steps + 1));
   for (int i = 0; i <= n_steps; i++) {
-    option_tree[n_steps][i] = std::max(underlying_tree[n_steps][i] - m_strike, 0.0);
+    if (typeid(this).name() == "Euro_Call" || typeid(this).name() == "US_Call")
+      option_tree[n_steps][i] = std::max(underlying_tree[n_steps][i] - m_strike, 0.0);
+    else
+      option_tree[n_steps][i] = std::max(m_strike - underlying_tree[n_steps][i], 0.0);
   }
 
   for (int i = n_steps - 1; i >= 0; i--) {
@@ -53,7 +56,7 @@ double Euro_Call::get_black_scholes() {
 
 double Euro_Call::get_monte_carlo(const uint32_t& n_sim) {
   double drift = (m_rate - 0.5 * m_sigma * m_sigma) * m_T;
-  double diffusion = m_sigma;
+  double diffusion = m_sigma * sqrt(m_T);
 
   double payoff_sum = 0.0;
 
@@ -86,7 +89,7 @@ double Euro_Put::get_black_scholes() {
 
 double Euro_Put::get_monte_carlo(const uint32_t& n_sim) {
   double drift = (m_rate - 0.5 * m_sigma * m_sigma) * m_T;
-  double diffusion = m_sigma;
+  double diffusion = m_sigma * sqrt(m_T);
 
   double payoff_sum = 0.0;
 
@@ -97,6 +100,53 @@ double Euro_Put::get_monte_carlo(const uint32_t& n_sim) {
     double Z = distribution(generator);
     double S_forward = m_spot * exp(drift + diffusion * Z);
     payoff_sum += std::max(m_strike - S_forward, 0.0);
+  }
+
+  return (payoff_sum / n_sim) * exp(-m_rate * m_T);
+}
+
+US_Option::US_Option(double spot, double strike, double sigma, double rate, double div, double T):
+Option(spot, strike, sigma, rate, div, T) {};
+
+US_Call::US_Call(double spot, double strike, double sigma, double rate, double div, double T):
+US_Option(spot, strike, sigma, rate, div, T) {};
+
+double US_Call::get_monte_carlo(const uint32_t& n_sim) {
+  double drift = (m_rate - 0.5 * m_sigma * m_sigma) * m_T;
+  double diffusion = m_sigma * sqrt(m_T);
+
+  double payoff_sum = 0.0;
+
+  boost::random::mt19937 generator;
+  boost::random::normal_distribution<> distribution;
+
+  for (int i = 0; i < n_sim; i++) {
+    double Z = distribution(generator);
+    double S_forward = m_spot * exp(drift + diffusion * Z);
+    double current_sum = std::max(m_strike - S_forward, 0.0);
+    payoff_sum += std::max(current_sum, m_strike - m_spot);
+  }
+
+  return (payoff_sum / n_sim) * exp(-m_rate * m_T);
+}
+
+US_Put::US_Put(double spot, double strike, double sigma, double rate, double div, double T):
+US_Option(spot, strike, sigma, rate, div, T) {};
+
+double US_Put::get_monte_carlo(const uint32_t& n_sim) {
+  double drift = (m_rate - 0.5 * m_sigma * m_sigma) * m_T;
+  double diffusion = m_sigma * sqrt(m_T);
+
+  double payoff_sum = 0.0;
+
+  boost::random::mt19937 generator;
+  boost::random::normal_distribution<> distribution;
+
+  for (int i = 0; i < n_sim; i++) {
+    double Z = distribution(generator);
+    double S_forward = m_spot * exp(drift + diffusion * Z);
+    double current_sum = std::max(S_forward - m_strike, 0.0);
+    payoff_sum += std::max(current_sum, m_spot - m_strike);
   }
 
   return (payoff_sum / n_sim) * exp(-m_rate * m_T);
