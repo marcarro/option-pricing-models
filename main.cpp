@@ -1,4 +1,3 @@
-#include <array>
 #include "option.hpp"
 #include "io.hpp"
 

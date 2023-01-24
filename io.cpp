@@ -11,6 +11,7 @@ void welcome_message() {
 
 void select_option(int& option) {
   while (option < 1 || option > 4) {
+    std::cout << "Select: ";
     cin >> option;
     if (option < 1 || option > 4) cout << "Please select options 1 through 4!" << endl;
   }
@@ -60,11 +61,13 @@ void pricing_model_message(int& option) {
 void verify_model_input(int& model, int& option) {
   if (option == 1 || option == 2) {
     while (model < 1 || model > 2) {
+      cout << "Select: ";
       cin >> model;
       if (model < 1 || model > 2) cout << "Please select options 1 or 2!" << endl;
     }
   } else {
     while (model < 1 || model > 3) {
+      cout << "Select: ";
       cin >> model;
       if (model < 1 || model > 3) cout << "Please select options 1 through 3!" << endl;
     }
