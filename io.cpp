@@ -76,40 +76,10 @@ void choose_model(int& model, int& option) {
   verify_model_input(model, option);
 }
 
-void display_price(std::unique_ptr<Option>& option, int& model, int& option_kind) {
+void display_price(std::unique_ptr<Option>& option, int& model) {
   cout << "Price: ";
-  if (option_kind == 1) {
-    if (model == 1) 
-      cout << dynamic_cast<US_Call*>(option.get())->get_binomial(2500);
-    else 
-      cout << dynamic_cast<US_Call*>(option.get())->get_monte_carlo(100'000);
-  } else if (option_kind == 2) {
-    if (model == 1)
-      cout << dynamic_cast<US_Put*>(option.get())->get_binomial(2500);
-    else 
-      cout << dynamic_cast<US_Put*>(option.get())->get_monte_carlo(100'000);
-  } else if (option_kind == 3) {
-    if (model == 1)
-      cout << dynamic_cast<Euro_Call*>(option.get())->get_binomial(2500);
-    else if (model == 2)
-      cout << dynamic_cast<Euro_Call*>(option.get())->get_monte_carlo(100'000);
-    else
-      cout << dynamic_cast<Euro_Call*>(option.get())->get_black_scholes();
-  } else if (option_kind == 4) {
-    if (model == 1)
-      cout << dynamic_cast<Euro_Put*>(option.get())->get_binomial(2500);
-    else if (model == 2)
-      cout << dynamic_cast<Euro_Put*>(option.get())->get_monte_carlo(100'000);
-    else
-      cout << dynamic_cast<Euro_Put*>(option.get())->get_black_scholes();
-  }
+  if (model == 1) cout << option->get_binomial(2500);
+  else if (model == 2) cout << option->get_monte_carlo(100'000);
+  else cout << option->get_black_scholes();
   cout << endl;
 }
-
-// void display_price(std::unique_ptr<Option>& option, int& model) {
-//   cout << "Price: ";
-//   if (model == 1) cout << option->get_binomial(2500);
-//   else if (model == 2) cout << option->get_monte_carlo(100'000);
-//   else cout << option->get_black_scholes();
-//   cout << endl;
-// }

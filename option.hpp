@@ -15,6 +15,8 @@ protected:
 public:
   Option(double spot, double strike, double sigma, double rate, double div, double T);
   virtual double get_binomial(const uint32_t& n_steps);
+  virtual double get_black_scholes() {};
+  virtual double get_monte_carlo(const uint32_t& n_sim) {};
 };
 
 class Euro_Option : public Option {

@@ -16,8 +16,7 @@ std::unique_ptr<Option> get_option(const int& option, const std::array<double, 6
 
 void choose_model(int& model, int& option);
 
-void display_price(std::unique_ptr<Option>& option, int& model, int& option_kind);
 
-// void display_price(std::unique_ptr<Option>& option, int& model);
+void display_price(std::unique_ptr<Option>& option, int& model);
 
 #endif

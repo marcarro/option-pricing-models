@@ -16,5 +16,5 @@ int main() {
   int model{0};
   choose_model(model, option_kind);
 
-  display_price(my_option, model, option_kind);
+  display_price(my_option, model);
 }
